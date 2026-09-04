@@ -62,6 +62,8 @@ npm run check
 
 See [docs/architecture.md](docs/architecture.md), [contracts/openapi.yaml](contracts/openapi.yaml), and [contracts/mcp-tools.json](contracts/mcp-tools.json).
 
+The interface follows established staff-service and enterprise worklist patterns. See [the UX design rationale](docs/ux-design-rationale.md).
+
 ## Production adapters
 
 The local model, retrieval, workflow, and tool behavior is deterministic so the entire control path can run without credentials. The target AWS adapters are:
