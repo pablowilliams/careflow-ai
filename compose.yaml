@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    environment:
+      AI_PROVIDER: local
+      CAREFLOW_DEMO_MODE: "true"
+      CAREFLOW_WRITE_KILL_SWITCH: "false"
+    ports:
+      - "3000:3000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true

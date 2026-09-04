@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# Synthetic portfolio demonstration; not a live clinical service.

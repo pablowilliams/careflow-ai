@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "defaultPolicy": "deny",
+  "tools": [
+    { "name": "get_referral", "riskClass": "read", "approval": "not-required", "permissions": ["referral:read:assigned"] },
+    { "name": "search_guidance", "riskClass": "read", "approval": "not-required", "permissions": ["knowledge:read:approved"] },
+    { "name": "check_required_fields", "riskClass": "deterministic-read", "approval": "not-required", "permissions": ["rules:execute"] },
+    { "name": "draft_information_request", "riskClass": "local-draft", "approval": "not-required", "permissions": ["proposal:create"] },
+    { "name": "create_work_item", "riskClass": "write", "approval": "exact-payload", "permissions": ["task:create:draft"], "idempotency": "required" },
+    { "name": "send_message", "riskClass": "write", "approval": "exact-payload", "permissions": ["message:send:approved"], "idempotency": "required", "enabled": false }
+  ]
+}

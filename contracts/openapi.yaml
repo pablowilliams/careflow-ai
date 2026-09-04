@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: CareFlow AI Portfolio API
+  version: 1.1.0
+  description: Synthetic referral workflow. No endpoint accepts real patient data.
+servers:
+  - url: /api
+paths:
+  /referrals:
+    get:
+      operationId: listReferrals
+      summary: List synthetic referrals visible to the coordinator
+      responses:
+        "200":
+          description: Synthetic referral collection
+  /workflows:
+    post:
+      operationId: runReferralReview
+      summary: Run the bounded, read-only review workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [referralId]
+              properties:
+                referralId: { type: string, pattern: '^SR-[0-9-]+$' }
+      responses:
+        "201": { description: Review, evidence, proposal, policy decision and trace }
+        "404": { $ref: '#/components/responses/Problem' }
+  /approvals:
+    post:
+      operationId: approveProposal
+      summary: Approve and execute one exact draft-only action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [runId, referralId, payloadHash, body, idempotencyKey, approvedBy, purposeOfUse]
+              properties:
+                runId: { type: string, pattern: '^RUN-' }
+                referralId: { type: string }
+                payloadHash: { type: string, pattern: '^sha256:' }
+                body: { type: string, minLength: 1 }
+                idempotencyKey: { type: string, minLength: 8 }
+                approvedBy: { type: string, format: email }
+                purposeOfUse: { type: string, const: care-coordination }
+      responses:
+        "201": { description: Idempotent downstream draft receipt }
+        "403": { $ref: '#/components/responses/Problem' }
+        "409": { $ref: '#/components/responses/Problem' }
+        "410": { $ref: '#/components/responses/Problem' }
+  /health:
+    get:
+      operationId: getHealth
+      summary: Inspect runtime dependencies and deterministic control posture
+      responses:
+        "200": { description: Health and control posture }
+  /runs/{runId}:
+    get:
+      operationId: exportRun
+      summary: Export a redacted incident bundle for a recorded workflow run
+      parameters:
+        - in: path
+          name: runId
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Redacted workflow, trace and control evidence }
+        "404": { $ref: '#/components/responses/Problem' }
+  /fhir/ServiceRequest/{id}:
+    get:
+      operationId: getSyntheticServiceRequest
+      summary: Retrieve one synthetic FHIR R4 ServiceRequest
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Synthetic FHIR R4 ServiceRequest }
+        "404": { $ref: '#/components/responses/Problem' }
+components:
+  responses:
+    Problem:
+      description: RFC 7807-style safe problem response
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [code, title]
+            properties:
+              code: { type: string }
+              title: { type: string }
+              detail: { type: string }
